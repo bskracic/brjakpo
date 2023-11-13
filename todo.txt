@@ -1,0 +1,7 @@
+ishod 1: GET i POST CRUD
+ishod 2: login
+ishod 3: baza, relacije
+ishod 4: repo hibernate orm spring data jpa
+ishod 5: opet rest
+ishod 6: junit tests
+ishod 7: i18n

@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  db:
+    image: postgres:15.1
+    container_name: book-exchange-db
+    environment:
+      POSTGRES_DB: bookdb
+      POSTGRES_USER: bookUser
+      POSTGRES_PASSWORD: supersecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - book-exchange-db-volume:/var/lib/postgresql
+
+volumes:
+  book-exchange-db-volume: {}
