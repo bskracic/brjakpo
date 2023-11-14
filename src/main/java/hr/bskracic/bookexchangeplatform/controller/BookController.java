@@ -2,9 +2,12 @@ package hr.bskracic.bookexchangeplatform.controller;
 
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.BookAdDto;
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdDto;
+import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdInteractionDto;
 import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
 import hr.bskracic.bookexchangeplatform.service.BookService;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,10 +37,31 @@ public class BookController {
         return toBookAdDto(bookService.createBookAd(bookAdDto, username));
     }
 
+    @PutMapping("/ad")
+    public BookAdDto updateBookAd(
+            @RequestBody final BookAdDto bookAdDto
+    ){
+        return toBookAdDto(bookService.editBookAd(bookAdDto));
+    }
+
+
+    // SECURED BY ADMIN
+    @DeleteMapping("/ad/{id}")
+    @Secured("ROLE_ADMIN")
+    public void deleteBookAd(@PathVariable("id") final Long bookAdId) {
+        this.bookService.deleteBookAd(bookAdId);
+    }
+
+    @PostMapping("/ad/interaction")
+    public void createAdInteraction(@RequestBody final CreateBookAdInteractionDto dto, final String username) {
+        this.bookService.createBookInteraction(dto, username);
+    }
+
     private BookAdDto toBookAdDto(BookAd bookAd) {
         return BookAdDto.builder()
                 .id(bookAd.getId())
                 .bookName(bookAd.getBookName())
+                .author(bookAd.getAuthor())
                 .description(bookAd.getDescription())
                 .active(bookAd.getActive())
                 .rating(bookAd.getRating())

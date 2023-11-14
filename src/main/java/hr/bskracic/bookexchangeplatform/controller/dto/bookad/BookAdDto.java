@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class BookAdDto {
     private final Long id;
     private final String bookName;
+    private final String author;
     private final String description;
     private final Integer rating;
     private final Boolean active;

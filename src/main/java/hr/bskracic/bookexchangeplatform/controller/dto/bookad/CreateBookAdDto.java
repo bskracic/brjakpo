@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 public class CreateBookAdDto {
     private final String bookName;
+    private final String author;
     private final String description;
     private final Integer rating;
     private final Boolean active;
