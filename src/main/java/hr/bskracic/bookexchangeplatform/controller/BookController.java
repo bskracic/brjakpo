@@ -1,5 +1,7 @@
 package hr.bskracic.bookexchangeplatform.controller;
 
+import hr.bskracic.bookexchangeplatform.config.BadRequestException;
+import hr.bskracic.bookexchangeplatform.config.ErrorMessage;
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.BookAdDto;
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdDto;
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdInteractionDto;
@@ -7,6 +9,7 @@ import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
 import hr.bskracic.bookexchangeplatform.service.BookService;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,9 +55,17 @@ public class BookController {
         this.bookService.deleteBookAd(bookAdId);
     }
 
-    @PostMapping("/ad/interaction")
-    public void createAdInteraction(@RequestBody final CreateBookAdInteractionDto dto, final String username) {
-        this.bookService.createBookInteraction(dto, username);
+    @PostMapping("/ad/{id}/interaction")
+    public void createAdInteraction(
+            @PathVariable("id") Long bookAdId,
+            @RequestAttribute("username") final String username) throws BadRequestException {
+
+            try {
+                this.bookService.createBookInteraction(bookAdId, username);
+            } catch (DataIntegrityViolationException ex) {
+                throw new BadRequestException(ErrorMessage.DUPLICATE_ENTRY.getValue());
+            }
+
     }
 
     private BookAdDto toBookAdDto(BookAd bookAd) {

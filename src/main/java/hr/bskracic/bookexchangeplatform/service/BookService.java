@@ -5,6 +5,7 @@ import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdDto;
 import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdInteractionDto;
 import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
 import hr.bskracic.bookexchangeplatform.repository.model.BookAdInteraction;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,5 +25,5 @@ public interface BookService {
 
     void deleteBookAd(final Long bookAdId);
 
-    BookAdInteraction createBookInteraction(final CreateBookAdInteractionDto bookAdInteractionDto, final String username);
+    void createBookInteraction(final Long bookAdId, final String username) throws DataIntegrityViolationException;
 }

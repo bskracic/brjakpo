@@ -10,8 +10,10 @@ import hr.bskracic.bookexchangeplatform.repository.UserRepository;
 import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
 import hr.bskracic.bookexchangeplatform.repository.model.BookAdInteraction;
 import hr.bskracic.bookexchangeplatform.service.BookService;
+import jakarta.persistence.UniqueConstraint;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookAd createBookAd(final CreateBookAdDto dto, final String username) {
         Optional<User> user = userRepository.findUserByUsername(username);
-        if(user.isEmpty())
+        if (user.isEmpty())
             throw new UsernameNotFoundException(username);
 
         val bookAdToSave = BookAd.builder()
@@ -85,11 +87,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookAdInteraction createBookInteraction(final CreateBookAdInteractionDto bookAdInteractionDto, final String username) {
-        val bookAd = bookAdRepository.findById(bookAdInteractionDto.getBookAdId()).orElseThrow();
+    public void createBookInteraction(final Long bookAdId, final String username) throws DataIntegrityViolationException {
+        val bookAd = bookAdRepository.findById(bookAdId).orElseThrow();
         val user = userRepository.findUserByUsername(username).orElseThrow();
-        return this.bookAdInteractionRepo.save(
-                BookAdInteraction.builder().bookAd(bookAd).user(user).createdAt(LocalDateTime.now()).build()
+        this.bookAdInteractionRepo.save(
+                BookAdInteraction.builder()
+                        .bookAd(bookAd).user(user).createdAt(LocalDateTime.now())
+                        .build()
         );
     }
 }

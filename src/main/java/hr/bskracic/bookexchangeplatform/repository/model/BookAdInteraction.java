@@ -13,7 +13,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "book_ad_interaction")
+@Table(
+        name = "book_ad_interaction",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_ad_id"})
+)
 @Data
 @Builder
 @AllArgsConstructor
