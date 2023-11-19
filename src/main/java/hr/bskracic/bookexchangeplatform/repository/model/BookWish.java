@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "book_ad_interaction",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_ad_id"})
+        name = "book_wish",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"})
 )
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookAdInteraction {
+public class BookWish {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,9 +33,12 @@ public class BookAdInteraction {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "book_ad_id", nullable = false)
+    @JoinColumn(name = "book_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private BookAd bookAd;
+    private Book book;
+
+    @Column(name = "message")
+    private String message;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

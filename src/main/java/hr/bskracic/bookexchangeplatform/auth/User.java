@@ -1,8 +1,8 @@
 package hr.bskracic.bookexchangeplatform.auth;
 
 
-import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
-import hr.bskracic.bookexchangeplatform.repository.model.BookAdInteraction;
+import hr.bskracic.bookexchangeplatform.repository.model.Book;
+import hr.bskracic.bookexchangeplatform.repository.model.BookWish;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,10 +39,10 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookAd> bookAds;
+    private List<Book> books;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookAdInteraction> interactions = new HashSet<>();
+    private Set<BookWish> interactions = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

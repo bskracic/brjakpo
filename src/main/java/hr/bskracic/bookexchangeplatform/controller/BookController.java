@@ -2,12 +2,12 @@ package hr.bskracic.bookexchangeplatform.controller;
 
 import hr.bskracic.bookexchangeplatform.config.BadRequestException;
 import hr.bskracic.bookexchangeplatform.config.ErrorMessage;
-import hr.bskracic.bookexchangeplatform.controller.dto.bookad.BookAdDto;
-import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdDto;
-import hr.bskracic.bookexchangeplatform.controller.dto.bookad.CreateBookAdInteractionDto;
-import hr.bskracic.bookexchangeplatform.repository.model.BookAd;
+import hr.bskracic.bookexchangeplatform.controller.dto.book.BookDto;
+import hr.bskracic.bookexchangeplatform.controller.dto.book.CreateBookDto;
+import hr.bskracic.bookexchangeplatform.controller.dto.wish.CreateBookWishDto;
+import hr.bskracic.bookexchangeplatform.repository.model.Book;
+import hr.bskracic.bookexchangeplatform.repository.projection.BookProjection;
 import hr.bskracic.bookexchangeplatform.service.BookService;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.annotation.Secured;
@@ -22,63 +22,91 @@ public class BookController {
 
     private final BookService bookService;
 
-    @GetMapping("/ad/all")
-    public List<BookAdDto> getAllBookAds() {
-        return bookService.getAllBookAds().stream().map(this::toBookAdDto).toList();
+    @GetMapping("/all")
+    @Secured("ROLE_ADMIN")
+    public List<BookDto> getAllBookAds() {
+        return bookService.getAllBookAds().stream().map(this::toBookDto).toList();
     }
 
-    @GetMapping("/ad")
-    public List<BookAdDto> getAllBooksForUser(@RequestAttribute("username") final String username) {
-        return bookService.getAllBooksForUser(username).stream().map(this::toBookAdDto).toList();
+    @GetMapping("/user")
+    public List<BookDto> getAllBooksForUser(@RequestAttribute("username") final String username) {
+        return bookService.getAllBooksForUser(username).stream().map(this::toBookDto).toList();
     }
 
-    @PostMapping("/ad")
-    public BookAdDto createBookAd(
-            @RequestBody final CreateBookAdDto bookAdDto,
+    @GetMapping("/{id}")
+    public BookDto getBook(
+            @PathVariable("id") final Long bookId,
+            @RequestAttribute("username") final String username) {
+        return toBookDto(bookService.getBook(bookId, username));
+    }
+
+    @PostMapping
+    public BookDto createBookAd(
+            @RequestBody final CreateBookDto bookAdDto,
             @RequestAttribute("username") final String username) {
 
-        return toBookAdDto(bookService.createBookAd(bookAdDto, username));
+        return toBookDto(bookService.createBookAd(bookAdDto, username));
     }
 
-    @PutMapping("/ad")
-    public BookAdDto updateBookAd(
-            @RequestBody final BookAdDto bookAdDto
-    ){
-        return toBookAdDto(bookService.editBookAd(bookAdDto));
+    @PutMapping
+    public BookDto updateBookAd(
+            @RequestBody final BookDto bookDto) {
+        return toBookDto(bookService.editBookAd(bookDto));
     }
 
 
     // SECURED BY ADMIN
-    @DeleteMapping("/ad/{id}")
+    @DeleteMapping("/{id}")
     @Secured("ROLE_ADMIN")
     public void deleteBookAd(@PathVariable("id") final Long bookAdId) {
         this.bookService.deleteBookAd(bookAdId);
     }
 
-    @PostMapping("/ad/{id}/interaction")
-    public void createAdInteraction(
-            @PathVariable("id") Long bookAdId,
-            @RequestAttribute("username") final String username) throws BadRequestException {
+    @PostMapping("/{id}/wish")
+    public void createBookWish(
+            @PathVariable("id") final Long bookAdId,
+            @RequestAttribute("username") final String username,
+            @RequestBody final CreateBookWishDto dto
+            ) throws BadRequestException {
 
             try {
-                this.bookService.createBookInteraction(bookAdId, username);
+                this.bookService.createBookWish(bookAdId, username, dto.message());
             } catch (DataIntegrityViolationException ex) {
                 throw new BadRequestException(ErrorMessage.DUPLICATE_ENTRY.getValue());
             }
-
     }
 
-    private BookAdDto toBookAdDto(BookAd bookAd) {
-        return BookAdDto.builder()
-                .id(bookAd.getId())
-                .bookName(bookAd.getBookName())
-                .author(bookAd.getAuthor())
-                .description(bookAd.getDescription())
-                .active(bookAd.getActive())
-                .rating(bookAd.getRating())
-                .createdAt(bookAd.getCreatedAt())
+    private BookDto toBookDto(Book book) {
+        return BookDto.builder()
+                .id(book.getId())
+                .bookName(book.getBookName())
+                .author(book.getAuthor())
+                .description(book.getDescription())
+                .genre(book.getGenre())
+                .price(book.getPrice())
+                .active(book.getActive())
+                .rating(book.getRating())
+                .wishes(book.getWishes())
+                .picture(new String(book.getPicture()))
+                .createdAt(book.getCreatedAt())
                 .userId(null).build();
+    }
 
+    private BookDto toBookDto(BookProjection book) {
+        return BookDto.builder()
+                .id(book.getId())
+                .bookName(book.getBookName())
+                .author(book.getAuthor())
+                .description(book.getDescription())
+                .genre(book.getGenre())
+                .price(book.getPrice())
+                .active(book.getActive())
+                .rating(book.getRating())
+                .wishes(book.getWishes())
+                .picture(new String(book.getPicture()))
+                .createdAt(book.getCreatedAt())
+                .wishedByUser(book.getWishedByUser())
+                .userId(null).build();
     }
 
 }
