@@ -18,8 +18,13 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findBookByUserUsernameAndActive(final String username, final boolean active);
 
     @Query(value =
-            "select * from book b where b.active is true order by b.created_at desc",
+            """
+            select b.*, (select count(*) from book_wish bw where bw.book_id = b.id) as wishes
+            from book b
+            where b.active is true order by b.created_at desc
+            """,
             nativeQuery = true)
+    @Transactional
     List<Book> findRecentBookAds();
 
     @Query(value = "select case when count(*) > 0 then true else false end from book_wish inner join _user on _user.id = book_wish.user_id where book_id = :bookId and _user.username = :username",

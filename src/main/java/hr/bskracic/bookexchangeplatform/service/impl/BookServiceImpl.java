@@ -10,6 +10,7 @@ import hr.bskracic.bookexchangeplatform.repository.UserRepository;
 import hr.bskracic.bookexchangeplatform.repository.model.Book;
 import hr.bskracic.bookexchangeplatform.repository.model.BookWish;
 import hr.bskracic.bookexchangeplatform.repository.projection.BookProjection;
+import hr.bskracic.bookexchangeplatform.repository.projection.BookWishProjection;
 import hr.bskracic.bookexchangeplatform.service.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -42,6 +43,16 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> getAllActiveAdsForUser(String username) {
         return bookRepository.findBookByUserUsernameAndActive(username, true);
+    }
+
+    @Override
+    public List<BookWishProjection> getAllBookWishesForBook(final Long bookId) {
+        return bookWishrepository.findBookWishByBookId(bookId).stream()
+                .map(bw -> BookWishProjection.builder()
+                            .username(bw.getUser().getUsername())
+                            .message(bw.getMessage())
+                            .createdAt(bw.getCreatedAt()).build())
+                .toList();
     }
 
     @Override
@@ -81,7 +92,7 @@ public class BookServiceImpl implements BookService {
                 .genre(dto.getGenre())
                 .price(dto.getPrice())
                 .picture(dto.getPicture().getBytes())
-                .active(dto.getActive())
+                .active(true)
                 .rating(dto.getRating())
                 .user(user.get())
                 .createdAt(LocalDateTime.now()).build();

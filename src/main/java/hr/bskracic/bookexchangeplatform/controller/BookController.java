@@ -28,9 +28,10 @@ public class BookController {
         return bookService.getAllBookAds().stream().map(this::toBookDto).toList();
     }
 
-    @GetMapping("/user")
-    public List<BookDto> getAllBooksForUser(@RequestAttribute("username") final String username) {
-        return bookService.getAllBooksForUser(username).stream().map(this::toBookDto).toList();
+
+    @GetMapping("/recent")
+    public List<BookDto> getAllRecentBooks() {
+        return bookService.getMostRecentAds().stream().map(this::toBookDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -38,6 +39,11 @@ public class BookController {
             @PathVariable("id") final Long bookId,
             @RequestAttribute("username") final String username) {
         return toBookDto(bookService.getBook(bookId, username));
+    }
+
+    @GetMapping("/user")
+    public List<BookDto> getAllBooksForUser(@RequestAttribute("username") final String username) {
+        return bookService.getAllBooksForUser(username).stream().map(this::toBookDto).toList();
     }
 
     @PostMapping
@@ -62,19 +68,6 @@ public class BookController {
         this.bookService.deleteBookAd(bookAdId);
     }
 
-    @PostMapping("/{id}/wish")
-    public void createBookWish(
-            @PathVariable("id") final Long bookAdId,
-            @RequestAttribute("username") final String username,
-            @RequestBody final CreateBookWishDto dto
-            ) throws BadRequestException {
-
-            try {
-                this.bookService.createBookWish(bookAdId, username, dto.message());
-            } catch (DataIntegrityViolationException ex) {
-                throw new BadRequestException(ErrorMessage.DUPLICATE_ENTRY.getValue());
-            }
-    }
 
     private BookDto toBookDto(Book book) {
         return BookDto.builder()
