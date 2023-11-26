@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -27,7 +28,6 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-    private final BookWishRepository bookWishrepository;
     private final UserRepository userRepository;
 
     @Override
@@ -38,21 +38,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> getMostRecentAds() {
         return bookRepository.findRecentBookAds();
-    }
-
-    @Override
-    public List<Book> getAllActiveAdsForUser(String username) {
-        return bookRepository.findBookByUserUsernameAndActive(username, true);
-    }
-
-    @Override
-    public List<BookWishProjection> getAllBookWishesForBook(final Long bookId) {
-        return bookWishrepository.findBookWishByBookId(bookId).stream()
-                .map(bw -> BookWishProjection.builder()
-                            .username(bw.getUser().getUsername())
-                            .message(bw.getMessage())
-                            .createdAt(bw.getCreatedAt()).build())
-                .toList();
     }
 
     @Override
@@ -71,12 +56,14 @@ public class BookServiceImpl implements BookService {
                 .wishes(book.getWishes())
                 .picture(book.getPicture())
                 .createdAt(book.getCreatedAt())
-                .wishedByUser(wished).build();
+                .wishedByUser(wished)
+                .currentUserOwner(Objects.equals(book.getUser().getUsername(), username))
+                .build();
     }
 
     @Override
     public List<Book> getAllBooksForUser(String username) {
-        return bookRepository.findBookByUserUsername(username);
+        return bookRepository.findBookByUserUsernameOrderByActiveDescCreatedAtDesc(username);
     }
 
     @Override
@@ -117,16 +104,5 @@ public class BookServiceImpl implements BookService {
     public void deleteBookAd(final Long id) {
         val bookAd = bookRepository.findById(id).orElseThrow();
         bookRepository.delete(bookAd);
-    }
-
-    @Override
-    public void createBookWish(final Long bookId, final String username, final String message) throws DataIntegrityViolationException {
-        val bookAd = bookRepository.findById(bookId).orElseThrow();
-        val user = userRepository.findUserByUsername(username).orElseThrow();
-        this.bookWishrepository.save(
-                BookWish.builder()
-                        .book(bookAd).user(user).message(message).createdAt(LocalDateTime.now())
-                        .build()
-        );
     }
 }

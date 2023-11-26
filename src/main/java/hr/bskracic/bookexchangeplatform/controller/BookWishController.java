@@ -3,9 +3,8 @@ package hr.bskracic.bookexchangeplatform.controller;
 import hr.bskracic.bookexchangeplatform.config.BadRequestException;
 import hr.bskracic.bookexchangeplatform.config.ErrorMessage;
 import hr.bskracic.bookexchangeplatform.controller.dto.wish.CreateBookWishDto;
-import hr.bskracic.bookexchangeplatform.repository.model.BookWish;
 import hr.bskracic.bookexchangeplatform.repository.projection.BookWishProjection;
-import hr.bskracic.bookexchangeplatform.service.BookService;
+import hr.bskracic.bookexchangeplatform.service.BookWishService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookWishController {
 
-    private final BookService bookService;
+    private final BookWishService bookWishService;
+
     @GetMapping("/{id}/wish")
     public List<BookWishProjection> getAllWishesForBook(@PathVariable("id") final Long bookId) {
-        return bookService.getAllBookWishesForBook(bookId);
+        return bookWishService.getAllBookWishesForBook(bookId);
     }
 
     @PostMapping("/{id}/wish")
@@ -31,9 +31,14 @@ public class BookWishController {
     ) throws BadRequestException {
 
         try {
-            this.bookService.createBookWish(bookAdId, username, dto.message());
+            this.bookWishService.createBookWish(bookAdId, username, dto.message());
         } catch (DataIntegrityViolationException ex) {
             throw new BadRequestException(ErrorMessage.DUPLICATE_ENTRY.getValue());
         }
+    }
+
+    @PostMapping("/wish/{id}/win")
+    public void markBookWishAsWin(@PathVariable("id") final Long bookWishId) {
+        this.bookWishService.markBookWishAsWin(bookWishId);
     }
 }

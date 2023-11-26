@@ -12,4 +12,6 @@ public interface AuthService {
     boolean doesUserExists(RegisterRequest request);
 
     boolean validateFields(RegisterRequest request);
+
+    boolean isAdmin(final String username);
 }

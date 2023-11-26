@@ -28,7 +28,6 @@ public class BookController {
         return bookService.getAllBookAds().stream().map(this::toBookDto).toList();
     }
 
-
     @GetMapping("/recent")
     public List<BookDto> getAllRecentBooks() {
         return bookService.getMostRecentAds().stream().map(this::toBookDto).toList();
@@ -60,8 +59,6 @@ public class BookController {
         return toBookDto(bookService.editBookAd(bookDto));
     }
 
-
-    // SECURED BY ADMIN
     @DeleteMapping("/{id}")
     @Secured("ROLE_ADMIN")
     public void deleteBookAd(@PathVariable("id") final Long bookAdId) {
@@ -85,6 +82,8 @@ public class BookController {
                 .userId(null).build();
     }
 
+
+
     private BookDto toBookDto(BookProjection book) {
         return BookDto.builder()
                 .id(book.getId())
@@ -99,6 +98,7 @@ public class BookController {
                 .picture(new String(book.getPicture()))
                 .createdAt(book.getCreatedAt())
                 .wishedByUser(book.getWishedByUser())
+                .currentUserOwner(book.getCurrentUserOwner())
                 .userId(null).build();
     }
 

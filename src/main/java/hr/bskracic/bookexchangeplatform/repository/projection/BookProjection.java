@@ -24,4 +24,5 @@ public class BookProjection {
     private byte[] picture;
     private Boolean wishedByUser;
     private Integer wishes;
+    private Boolean currentUserOwner;
 }

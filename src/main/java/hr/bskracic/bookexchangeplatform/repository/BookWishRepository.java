@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface BookWishRepository extends JpaRepository<BookWish, Long> {
-    @Query(value = "select * from book_wish bw where bw.book_id = :bookId", nativeQuery = true)
+    @Query(value = "select * from book_wish bw where bw.book_id = :bookId order by won, created_at desc", nativeQuery = true)
     @Transactional
     List<BookWish> findBookWishByBookId(final Long bookId);
 }

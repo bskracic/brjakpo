@@ -17,18 +17,13 @@ public interface BookService {
 
     List<Book> getMostRecentAds();
 
-    List<Book> getAllActiveAdsForUser(final String username);
-
-    List<BookWishProjection> getAllBookWishesForBook(final Long bookId);
+    List<Book> getAllBooksForUser(final String username);
 
     BookProjection getBook(final Long bookId, final String username);
-
-    List<Book> getAllBooksForUser(final String username);
     Book createBookAd(final CreateBookDto dto, final String username);
 
     Book editBookAd(final BookDto bookDto);
 
     void deleteBookAd(final Long bookAdId);
 
-    void createBookWish(final Long bookId, final String username, final String message) throws DataIntegrityViolationException;
 }

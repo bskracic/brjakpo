@@ -23,4 +23,5 @@ public class BookDto {
     private final String picture;
     private final Boolean wishedByUser;
     private final Integer wishes;
+    private final Boolean currentUserOwner;
 }

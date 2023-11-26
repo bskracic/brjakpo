@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class BookWishProjection {
+    private Long id;
     private String username;
     private String message;
+    private Boolean won;
     private LocalDateTime createdAt;
 }

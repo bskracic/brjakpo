@@ -65,6 +65,11 @@ public class AuthServiceImpl implements AuthService {
                 && request.getPassword() != null && !request.getPassword().isEmpty()
                 && request.getLanguage() != null && !request.getLanguage().isEmpty();
     }
+
+    @Override
+    public boolean isAdmin(String username) {
+        return userRepository.findUserByUsername(username).orElseThrow().getRole().equals(Role.ADMIN);
+    }
 }
 
 

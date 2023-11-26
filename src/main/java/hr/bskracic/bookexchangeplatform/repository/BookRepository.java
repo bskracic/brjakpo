@@ -12,16 +12,13 @@ import java.util.List;
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Transactional
-    List<Book> findBookByUserUsername(final String username);
-
-    @Transactional
-    List<Book> findBookByUserUsernameAndActive(final String username, final boolean active);
+    List<Book> findBookByUserUsernameOrderByActiveDescCreatedAtDesc(final String username);
 
     @Query(value =
             """
             select b.*, (select count(*) from book_wish bw where bw.book_id = b.id) as wishes
             from book b
-            where b.active is true order by b.created_at desc
+            where b.active is true order by b.active desc, b.created_at desc
             """,
             nativeQuery = true)
     @Transactional

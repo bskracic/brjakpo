@@ -40,6 +40,9 @@ public class BookWish {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "won")
+    private Boolean won;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
